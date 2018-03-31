@@ -95,11 +95,6 @@ def read_some_data(self, context):
 
     return {'FINISHED'}
 
-
-    
-
-# ImportHelper is a helper class, defines filename and
-# invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
@@ -125,7 +120,6 @@ class gizmoUVApplicator(Operator, ImportHelper):
     def poll(cls,context):
         return context.active_object.type == "MESH"
 
-# Only needed if you want to add into a dynamic menu
 def menu_func_import(self, context):
     self.layout.operator(gizmoUVApplicator.bl_idname, text="Import Decal Sheet")
 
