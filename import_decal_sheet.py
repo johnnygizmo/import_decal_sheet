@@ -32,9 +32,12 @@ def read_some_data(self, context):
     links = tree.links
 
     lowest_node = 999999
+    lowest_node_height = 0
+    
     for node in nodes:
         if node.location[1] < lowest_node:
             lowest_node = node.location[1]
+            lowest_node_height = node.height
 
     output_node = None
     for node in nodes:
@@ -54,19 +57,25 @@ def read_some_data(self, context):
     to_socket = outlink.to_socket
 
     new_node = nodes.new("ShaderNodeMixShader")
-
+ 
     links.remove(from_node.outputs[0].links[0])
-
     links.new(from_node.outputs[0],new_node.inputs[1])
     links.new(new_node.outputs[0],to_node.inputs[0])
 
     new_node.location = to_node.location
-    to_node.location[0] = to_node.location[0] + 200
+    to_node.location[0] = to_node.location[0] + 300
 
-
+    frame = nodes.new("NodeFrame")
+    frame.name = uv.name
+    frame.label = uv.name + ' Decal Frame'
+    frame.label_size = 20
+    frame.use_custom_color = True
+    frame.color = [0.6,0.7,1.0]
+    
     new_dif = nodes.new("ShaderNodeBsdfPrincipled")
-    new_dif.location = [new_node.location[0]-200, lowest_node-400]
+    new_dif.location = [new_node.location[0]-200, lowest_node-lowest_node_height-200]
     links.new(new_dif.outputs[0],new_node.inputs[2])
+    new_dif.parent = frame
 
     new_img = nodes.new("ShaderNodeTexImage")
     new_img.location = [new_dif.location[0]-200, new_dif.location[1]]
@@ -75,12 +84,13 @@ def read_some_data(self, context):
     image = bpy.data.images.load(self.filepath, False)
     new_img.image = image
     new_img.extension = 'EXTEND'
-
+    new_img.parent = frame
 
     new_uv  = nodes.new("ShaderNodeUVMap")
     new_uv.location = [new_img.location[0]-200, new_img.location[1]]
     links.new(new_uv.outputs[0],new_img.inputs[0])
     new_uv.uv_map = uv.name
+    new_uv.parent = frame
 
     return {'FINISHED'}
 
