@@ -1,13 +1,20 @@
 import bpy
 
-def read_some_data(self, context):
+bl_info = {
+    "name": "Import Decal Sheet",
+    "description": "Import a PNG file as a decal sheet. Add a mix shader to the end of the active material and add in the image with alpha mixing.",
+    "author": "Johnny Matthews - johnny.matthews@gmail.com",
+    "version": (0, 0, 1),
+    "blender": (2, 79, 0),
+    "location": "File > Import > Import Decal Sheet",
+    "warning": "",
+    "wiki_url": "",
+    "tracker_url": "",
+    "category": "Import-Export"
+}
 
+def read_some_data(self, context):
     ob = bpy.context.object
-    
-    if(ob.type != 'MESH'):
-        self.report({'ERROR_INVALID_INPUT'},"Selected Object Not a Mesh")
-        return {'FINISHED'}
-        
     mesh = bpy.context.object.data
    
     if len(mesh.uv_layers) == 8 :
@@ -35,6 +42,9 @@ def read_some_data(self, context):
             output_node = node
             break
 
+    if output_node == None:
+        self.report({'ERROR_INVALID_INPUT'},"Make sure active material has at least one shader and output connected.")
+        return {'FINISHED'} 
 
     outlink = output_node.inputs[0].links[0]
 
@@ -71,13 +81,6 @@ def read_some_data(self, context):
     new_uv.location = [new_img.location[0]-200, new_img.location[1]]
     links.new(new_uv.outputs[0],new_img.inputs[0])
     new_uv.uv_map = uv.name
-        
-    
-    
-    
-    
-    
-    
 
     return {'FINISHED'}
 
@@ -104,29 +107,16 @@ class gizmoUVApplicator(Operator, ImportHelper):
             maxlen=255,  # Max internal buffer length, longer would be clamped.
             )
 
-    # List of operator properties, the attributes will be assigned
-    # to the class instance from the operator settings before calling.
-#    use_setting = BoolProperty(
-#            name="",
-#            description="Example Tooltip",
-#            default=True,
-#            )
-
-#    type = EnumProperty(
-#            name="Example Enum",
-#            description="Choose between two items",
-#            items=(('OPT_A', "First Option", "Description one"),
-#                   ('OPT_B', "Second Option", "Description two")),
-#            default='OPT_A',
-#            )
-
     def execute(self, context):
         return read_some_data(self, context)
 
+    @classmethod
+    def poll(cls,context):
+        return context.active_object.type == "MESH"
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_import(self, context):
-    self.layout.operator(gizmoUVApplicator.bl_idname, text="Import Stencil Map")
+    self.layout.operator(gizmoUVApplicator.bl_idname, text="Import Decal Sheet")
 
 
 def register():
@@ -139,6 +129,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
-    # test call
-    bpy.ops.object.uv_applicator('INVOKE_DEFAULT')
