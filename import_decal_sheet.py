@@ -81,7 +81,8 @@ def read_some_data(self, context):
     new_img.location = [new_dif.location[0]-200, new_dif.location[1]]
     links.new(new_img.outputs[0],new_dif.inputs[0])
     links.new(new_img.outputs[1],new_node.inputs[0])
-    image = bpy.data.images.load(self.filepath, False)
+    image = bpy.data.images.l
+    oad(self.filepath, False)
     new_img.image = image
     new_img.extension = 'EXTEND'
     new_img.parent = frame
