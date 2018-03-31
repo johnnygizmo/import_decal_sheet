@@ -81,8 +81,7 @@ def read_some_data(self, context):
     new_img.location = [new_dif.location[0]-200, new_dif.location[1]]
     links.new(new_img.outputs[0],new_dif.inputs[0])
     links.new(new_img.outputs[1],new_node.inputs[0])
-    image = bpy.data.images.l
-    oad(self.filepath, False)
+    image = bpy.data.images.load(self.filepath, False)
     new_img.image = image
     new_img.extension = 'EXTEND'
     new_img.parent = frame
@@ -93,8 +92,15 @@ def read_some_data(self, context):
     new_uv.uv_map = uv.name
     new_uv.parent = frame
 
+
+    self.report({'INFO'},"UV Decal Map Added to object "+ob.name+" on UV Map "+uv.name)
     return {'FINISHED'}
 
+
+    
+
+# ImportHelper is a helper class, defines filename and
+# invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
@@ -120,6 +126,7 @@ class gizmoUVApplicator(Operator, ImportHelper):
     def poll(cls,context):
         return context.active_object.type == "MESH"
 
+# Only needed if you want to add into a dynamic menu
 def menu_func_import(self, context):
     self.layout.operator(gizmoUVApplicator.bl_idname, text="Import Decal Sheet")
 
